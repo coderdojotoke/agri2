@@ -2,6 +2,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using TMPro;
+//using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+
+
 public class SunMoveTest : MonoBehaviour
 {
     public TMP_InputField dateInput;
@@ -9,7 +13,6 @@ public class SunMoveTest : MonoBehaviour
     public TMP_InputField longitudeInput;
     public Slider timeSlider;
     public Light sunLight;
-
     private DateTime selectedDate = DateTime.Now;
     private float latitude = 35.6895f;   // 初期値：東京
     private float longitude = 139.6917f; // 初期値：東京
@@ -17,7 +20,9 @@ public class SunMoveTest : MonoBehaviour
     public void OnSubmit()
     {
         // 日付の入力を確認
-        if (DateTime.TryParse(dateInput.text, out DateTime parsedDate))
+        //TryParseは、文字列を日付型にするために、できるかどうかを判定。
+        if (DateTime.TryParseExact(dateInput.text, "yyyy/MM/dd",CultureInfo.InvariantCulture,DateTimeStyles.None,out DateTime parsedDate))
+            
             selectedDate = parsedDate;
 
         // 緯度・経度の入力を確認
@@ -25,9 +30,6 @@ public class SunMoveTest : MonoBehaviour
             latitude = lat;
         if (float.TryParse(longitudeInput.text, out float lon))
             longitude = lon;
-        Debug.Log("日付は、" + parsedDate);
-        Debug.Log("緯度は、" + lat);
-        Debug.Log("経度は、" + lon);
 
         UpdateSunDirection();
     }

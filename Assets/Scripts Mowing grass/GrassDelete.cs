@@ -19,12 +19,14 @@ public class GrassDelete : MonoBehaviour
     private float elapsedTime = 0f; // 経過時間
     private bool isRunning = false; // ストップウォッチの状態
     public TextMeshProUGUI Timetext;
+    public TextMeshProUGUI Leveltext;
+    private string deleteTag = "dk";
 
     void Start()
     {
-        terrain = Terrain.activeTerrain;
-        TerrainData runtimeData = Instantiate(terrain.terrainData);
-        terrain.terrainData = runtimeData;
+        //terrain = Terrain.activeTerrain;
+        //TerrainData runtimeData = Instantiate(terrain.terrainData);
+        //terrain.terrainData = runtimeData;
         elapsedTime = 0f;
         isRunning = true;
     }
@@ -41,36 +43,41 @@ public class GrassDelete : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Box")
+        if (other.CompareTag(deleteTag))
         {
-            nokori.value -= 5;
-            ClearGrass(transform.position, grassClearRadius);
-            Destroy(other);
-        }
-        else if (other.gameObject.tag == "GameClear")
-        {
+            nokori.value -= 1;
+            Destroy(other.gameObject); 
+
+            if (nokori.value == 0)
+         {
             isRunning = false;
-            //Timetext = timerText;
             canvas.gameObject.SetActive(true);
             Timetext.text = "今回のタイム:" + elapsedTime.ToString("F0") + "秒";
-            Debug.Log(timerText);
+                //Debug.Log(timerText);
+                if (elapsedTime <= 20)
+                {
+                    Leveltext.text = "Level 5";
+                }
+                if (elapsedTime >= 21 && elapsedTime <= 50)
+                {
+                    Leveltext.text = "Level 4";
+                }
+                if (elapsedTime >= 51 && elapsedTime <= 80)
+                {
+                    Leveltext.text = "Level 3";
+                }
+                if (elapsedTime >= 81 && elapsedTime <= 110)
+                {
+                    Leveltext.text = "Level 2";
+                }
+                if (elapsedTime >= 111)
+                {
+                    Leveltext.text = "Level 1";
+                }
+         }
+
         }
+        
     }
-
-    void ClearGrass(Vector3 pos, float radius)
-    {
-        if (terrain == null) return;
-        TerrainData data = terrain.terrainData;
-        int detailResolution = data.detailResolution;
-
-        Vector3 terrainPos = pos - terrain.transform.position;
-        int centerX = (int)(terrainPos.x / data.size.x * detailResolution);
-        int centerY = (int)(terrainPos.z / data.size.z * detailResolution);
-        int size = Mathf.CeilToInt(radius / data.size.x * detailResolution);
-
-        int[,] cleared = new int[size, size];
-        data.SetDetailLayer(centerX - size / 2, centerY - size / 2, detailLayer, cleared);
+    
     }
-}
-
-
